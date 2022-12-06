@@ -34,9 +34,12 @@ Code:
 
 Although the user will not have to type the names of the commands to chain together (this will all be done via drop down lists in GUI), they will still see to them referred to by the internal nomenclature -  capitalised strings with no spaces, sometimes with options parameters appended after a colon i.e. TASKDESCRIPTION:parameter
 
-An example of this which uses the full extended nomenclature including parameters, would be 'STRINGTOLIST:,' where 'STRINGTOLIST' maps to a function which takes text input, and separates it based on the substring immediately following the colon symbol - in this example using the comma symbol, and outputs it to a list of strings. This is analogous to the Python code 'output = str.split(',')' which is in fact how this is handled internally. (there is currently very little error checking at this stage and it is immediately apparent to me as I write this that I will need to edit the parser to handle the case where a colon is the separator itself.) Again, the user doesn't have to write these commands, but they will at least see the first part of them (before the colon) as they will be used for the 'function' names in the user context. They will have access to a library of these commands which will explain their usage, including the input and output types. All commands will either take a string or list type as input, and likewise output one or the other of these two types. Therefore, not all possible combinations of commands will be valid, the input and output of chained commands must match to be compatible.
+An example of this which uses the full extended nomenclature including parameters, would be 'STRINGTOLIST:,' where 'STRINGTOLIST' maps to a function which takes text input, and separates it based on the substring immediately following the colon symbol - in this example using the comma symbol, and outputs it to a list of strings. This is analogous to the Python code 'output = str.split(',')' which is in fact how this is handled internally. (there is currently very little error checking at this stage and it is immediately apparent to me as I write this that I will need to edit the parser to handle the case where a colon is the separator itself.) Again, the user doesn't have to write these commands, but they will at least see the first part of them (before the colon) as they will be used for the 'function' names in the user context. They will have access to a library of these commands which will explain their usage, including the input and output types. All commands will either take a string or list type as input, and likewise output one or the other of these two types. Therefore, not all possible combinations of commands will be valid, the input and output of chained commands must match to be compatible. *Actually, excel seems to manage to perform some of this desired functionality itself, where it manages to put the content into the correct rows, though it gets the columns out of sync by inconsistently including html elements in the data -  there is clearly metadata not being kept in the clipboard text when pasted into python, a generic text editor, or even using repr() function in python to show special characters. More research is needed here but the way I imagined performing this was by translating lists based on a known column or row length, after initially cleaning the text (there are unwanted elements in this example which do come through to the text-only clipboard content, for example 'Select item 5' - this is text attributed to a checkbox in the webpage (which we do not want as copy does not get the first instance of this, therefore putting the columns out of sync so we want to first remove instances of this text) - the text is not shown on the webpage but in excel it is displayed beside an actual check-box, it is likely an html or javascript component, perhaps a variable name. This is a good outline of how the user will need to initially inspect the contents of the returned clipboard text in order to know all required processing steps.
 
 Planned functions:
+
+  UNESCAPESPECIALS
+  Takes a string a un-escapes it's special characters in order to show the user what special characters are in the text - used for prototyping new workflows.
 
   STRINGTOLIST
   Takes text input and splits it into a list based on the required parameter passed in.
@@ -50,7 +53,22 @@ Planned functions:
   LISTTOTABLE
   Takes a list of lists and outputs them as *csv data based on parameter 'orientation', which can take values of 'row' or 'col' indicating whether each sub-list represents a row or a column of data
   * I need to figure out how we will handle 'csv' data, for different output purposes - what do we do about commas within the text, what about quotations etc - needs some testing. *
-  
+
+  REMOVEEMPTY
+  Takes a list and removes any empty elements, returns list
+
+  REMOVEELEMENTEQUALS
+  Takes a list and removes any elements which equal the string parameter
+
+  REMOVEELEMENTCONTAINS
+  Takes a list and removes any elements which contain the string parameter
+
+  REMOVEELEMENTSTARTSWITH
+  Takes a list and removes any elements which starts with the string parameter
+
+  REMOVEELEMENTENDSWITH
+  Takes a list and removes any elements which ends with the string parameter
+
   EXTRACTINTS
   Extracts all of the integers within the input text and passes them out in a list.
 

@@ -1,5 +1,5 @@
 from string_converters import *
-
+import pyperclip
 #print(extract_nums('3qrg45g45h45'))
 
 
@@ -19,7 +19,7 @@ def parser(coms):
                 sublst.append(el)
         elif el == 'ENDFOR':
             #sublst.append(el)
-            
+
             fortag = False
             forcount -= 1
             if forcount == 0:
@@ -72,7 +72,12 @@ def run_queue(queue,in_text):
             working_text = extract_ints(working_text)#returns string of ints separated by commas
         elif task == 'REMOVEEMPTY':
             working_text = remove_empty(working_text)
+        elif task == 'UNESCAPESPECIALS':
+            working_text = unescape_specials(working_text)
     return working_text
+
+
+#BASIC TESTING
 
 text = """11 individual sweets
 
@@ -90,4 +95,7 @@ commands = ['LINESMANYTOONE','STRINGTOLIST:,','REMOVEEMPTY','LISTTOSTRING: | ']
 parsed_commands = parser(commands)
 
 print(run_queue(parsed_commands,text))
-    
+
+print(" ----------- ")
+input("Copy text now")
+print(run_queue(parser(['STRIPWHITESPACE']),pyperclip.paste()))

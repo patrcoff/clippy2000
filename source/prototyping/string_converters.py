@@ -9,7 +9,7 @@
 #remove whitespace - all
 #remove linespaces
 #separate to lines on x
-#separate to lines by length per line
+#separate to lines by max length per line
 #remove custom x from all
 #extract numbers
 #extract emails
@@ -22,7 +22,10 @@ import re
 
 #--------------------------------------------------------------------
 #STRING FUNCTIONS
-def strip_whitespace(x):
+def unescape_specials(x):
+    return repr(x)[1:-1]#the repr func adds quotes to the text which we don't need
+
+def strip_whitespace(x):#TO DECIDE IF THIS SHOULD INCLUDE LINEBREAKS OR NOT - currently it escapes all whitespace including \r and \n
     return "".join(x.split())
 
 def extract_ints(x):#need a float version of this...
@@ -36,10 +39,13 @@ def lines_many_to_one(x,separator=','):
     remove_n =  separator.join(remove_r.split('\n'))
     return remove_n
 
+def replace_string(x,y,z):
+    return x.replace(y,z)
+
 #--------------------------------------------------------------------
 #LIST FUNCTIONS
 
-def act_on_list(lst,func):#this functionality has been moved out of the module functions and into the app logic,
+def act_on_list(lst,func):#this functionality has been moved out of the module functions and into the app logic, !!!!!!
     #where inputs include FOREACH and ENDFOR, which will work on either list or string items
     output = []
     for el in lst:
@@ -50,3 +56,12 @@ def lst_to_string(lst,joiner=''):
 
 def remove_empty(x):
     return [x for x in x if x != '' and x]
+
+#--------------------------------------------------------------------
+#COMBINED FUNCTIONS
+
+def remove_y(x,y):
+    if isinstance(x,str):
+        return x.replace(y,'')
+    elif isinstance(x,list):
+        return [x for x in x if x != y]
