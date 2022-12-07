@@ -1,101 +1,69 @@
-from string_converters import *
-import pyperclip
-#print(extract_nums('3qrg45g45h45'))
+from tkinter import *
+from functools import partial
+#from task_queue import *
+from pystray import Menu, MenuItem as item
+import pystray
+#import json
+#import re
+from PIL import Image, ImageTk
 
 
+#-------------------------------------------------------------------------------
+#GUI SECTION
+
+# Create an instance of tkinter frame or window
+win=Tk()
+
+win.title("System Tray Application")
+# Set the size of the window
+win.geometry("700x350")
+
+# Define a function for quit the window
+def quit_window(icon, item):
+    icon.stop()
+    win.destroy()
+
+# Define a function to show the window again
+def show_window(icon, item):
+    icon.stop()
+    win.after(0,win.deiconify())
+
+def test_func(x):
+    print(x)
+
+lst = ['LINESMANYTOONE','STRINGTOLIST:,','REMOVEEMPTY','LISTTOSTRING: | ']
+
+# Hide the window and show on the system taskbar
+#func_lst = [item(x,partial(test_func,x) for x in lst]
+#menu2 = tuple(func_lst)
 
 
-def parser(coms):
-    #print(coms)
-    out_list = []
-    fortag = False
-    sublst = []
-    forcount = 0
-    for el in coms:
-        if el == 'FOREACH':
-            fortag = True
-            forcount += 1
-            if forcount > 1:
-                sublst.append(el)
-        elif el == 'ENDFOR':
-            #sublst.append(el)
+#THIS IS NOT YET WORKING AS INTENDED
+#I am trying to generate a dropdown menu dynamically which contains the name of the command list and when clicked calls the function which runs said command list.
+#currently trying to make a proof of concept outside of the task_queue (hence commented out import) and just get the menu items to print the sting from a list
+#but it is instead printing all the items in the list, 5 times over...
+#there's only 4 items in the list too so I really don't understand why, the menu dropdown labels are correctly showing only once
+#documentation seems to sparse for this specific intended use case, may require to use a different library
+#next thing I'm going to try and do is disregard the below and try and get a dict of key;value pairs, where value is a callable and just manually call these values by key reference to ensure I'm understanding the lambda part ok
 
-            fortag = False
-            forcount -= 1
-            if forcount == 0:
-                out_list.append(parser(sublst))
-                #something
-                #sublst = []
-            elif forcount > 0:
-                sublst.append(el)
-        elif forcount > 0:
-            sublst.append(el)
-        else:
-            out_list.append(el)
-    return out_list
+def hide_window():
+    win.withdraw()
+    image=Image.open("favicon.ico")
+    menu=(item('Quit', quit_window),
+        #item('Lines: Many to one', lines_many_to_one),#some inbuilt commands do not need chaining if they directly map to a single function (but should we allo this?)
+        item('Tasks:',Menu(lambda : (item(x,test_func(x)) for x in lst))  ))#WE NEED TO MAKE A DROP DOWN LIST OF COMMANDS AVAILABLE IN THE available_commands DICT  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    icon=pystray.Icon("name", image, "My System Tray Icon", menu)
+    icon.run()
 
-def run_queue(queue,in_text):
-    working_text = in_text
-    for task in queue:
-        if isinstance(task, list):
-            #this is a FOREACH section, recursively call again on this
-            intermediary = []
-            '''
-            if isinstance(working_text,list):
-                for each el in working_text:
-                    intermediary_lst.append(run_queue(task,el))
-            elif isinstance(working_text,str):
-                for each el in working_text):
-                    intermediary_lst += run_queue(task,el)'''
-            for el in working_text:#where task is a sublist of tasks
-                intermediary.append(run_queue(task,el))#this is either action on each char or list element, and either outputs a list or string
-                #however, to make it possible to manage, the intermediary is always a list, so if user is not careful, they could get lists of lists
-                #some thought is needed in how to guide the user to avoid this so they don't make broken task queues
-            working_text = intermediary
-        elif task == 'STRIPWHITESPACE':
-            working_text = strip_whitespace(working_text)
-        elif 'STRINGTOLIST' in task:
-            splitter = task.split(':')[1]#we need to add error correction somewhere for if user doesn't supply splitter
-            working_text = string_to_list(working_text,splitter)#there will be a separate function though for lines to list, so there will be no default splitter here
-            #this will be put in the documentation so user knows they must supply splitter notation (or in GUI it will be required field just
-        elif 'LISTTOSTRING' in task:#default joiner is '', :parameter is optional
-            if len(task.split(':')) > 1:
-                working_text = lst_to_string(working_text,joiner=task.split(':')[1])
-            else:
-                working_text = lst_to_string(working_text)
-        elif 'LINESMANYTOONE' in task:
-            if len(task.split(':')) > 1:
-                working_text = lines_many_to_one(working_text,separator=task.split(':')[1])
-            else:
-                working_text = lines_many_to_one(working_text)#default separator is comma to provide csv like output
-        elif task == 'EXTRACTINTS':
-            working_text = extract_ints(working_text)#returns string of ints separated by commas
-        elif task == 'REMOVEEMPTY':
-            working_text = remove_empty(working_text)
-        elif task == 'UNESCAPESPECIALS':
-            working_text = unescape_specials(working_text)
-    return working_text
+"""
 
+def hide_window():
+    win.withdraw()
+    image=Image.open("favicon.ico")
+    #WE NEED TO MAKE A DROP DOWN LIST OF COMMANDS AVAILABLE IN THE available_commands DICT  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    pystray.Icon("name", image, "My System Tray Icon", menu=lambda: (item(x,test_func(x)) for x in lst)).run()
+    #icon.run()
+"""
+win.protocol('WM_DELETE_WINDOW', hide_window)
 
-#BASIC TESTING
-
-text = """11 individual sweets
-
-7 masks
-
-10 masks + cloth
-
-6 candles
-
-1 foot spa
-
-35 individual items"""
-
-commands = ['LINESMANYTOONE','STRINGTOLIST:,','REMOVEEMPTY','LISTTOSTRING: | ']
-parsed_commands = parser(commands)
-
-print(run_queue(parsed_commands,text))
-
-print(" ----------- ")
-input("Copy text now")
-print(run_queue(parser(['STRIPWHITESPACE']),pyperclip.paste()))
+win.mainloop()
