@@ -12,12 +12,13 @@ from PIL import Image, ImageTk
 #GUI SECTION
 
 # Create an instance of tkinter frame or window
+"""
 win=Tk()
 
 win.title("System Tray Application")
 # Set the size of the window
 win.geometry("700x350")
-
+"""
 # Define a function for quit the window
 def quit_window(icon, item):
     icon.stop()
@@ -46,6 +47,22 @@ lst = ['LINESMANYTOONE','STRINGTOLIST:,','REMOVEEMPTY','LISTTOSTRING: | ']
 #documentation seems to sparse for this specific intended use case, may require to use a different library
 #next thing I'm going to try and do is disregard the below and try and get a dict of key;value pairs, where value is a callable and just manually call these values by key reference to ensure I'm understanding the lambda part ok
 
+
+def generate_funcs_dict(lst):
+    dict = {}
+    for el in lst:
+        dict[el] = lambda : (test_func(el))
+    return dict
+
+
+
+functions = generate_funcs_dict(lst)
+
+
+tmp = functions['LINESMANYTOONE']
+input()
+tmp()
+"""
 def hide_window():
     win.withdraw()
     image=Image.open("favicon.ico")
@@ -55,7 +72,7 @@ def hide_window():
     icon=pystray.Icon("name", image, "My System Tray Icon", menu)
     icon.run()
 
-"""
+
 
 def hide_window():
     win.withdraw()
@@ -63,7 +80,8 @@ def hide_window():
     #WE NEED TO MAKE A DROP DOWN LIST OF COMMANDS AVAILABLE IN THE available_commands DICT  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     pystray.Icon("name", image, "My System Tray Icon", menu=lambda: (item(x,test_func(x)) for x in lst)).run()
     #icon.run()
-"""
+
 win.protocol('WM_DELETE_WINDOW', hide_window)
 
 win.mainloop()
+"""
