@@ -57,6 +57,36 @@ def lst_to_string(lst,joiner=''):
 def remove_empty(x):
     return [x for x in x if x != '' and x]
 
+def list_to_table(x,delim=','):#takes a list as input, i.e. a list of rows (separate lines) and separates lines on delim
+    table = []
+    for row in x:
+        table.append(string_to_list(row,delim))
+    return table
+
+def reverse_table(x):#reverse orientation of table, i.e. rows become columns
+    table = []#HERE WE'VE DONE NO ERROR CHECKNIG FOR TABLES OF INCONSISTENT SIZES
+    intermediate = []
+    for i in range(len(x[0])):#column
+        intermediate = [row[i] for row in x]
+        table.append(intermediate)
+    return table
+
+def get_column(x,y):
+    #expects a list of lists (representing a table)
+    #where each sublist is a column from the table (use in conjunction with table transform function - reverse_table)
+    #y is either the column number (1 indexed) or column header
+    if y.isnumeric():
+        #is column index
+        return x[int(y)-1]
+    else:
+        #will return first column if header not found
+        for col in x:
+            if col[0] == y:
+                #print(col)
+                return col
+        return x[0]
+
+        #is column header
 #--------------------------------------------------------------------
 #COMBINED FUNCTIONS
 

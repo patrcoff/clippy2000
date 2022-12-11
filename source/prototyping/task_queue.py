@@ -2,7 +2,7 @@ from string_converters import *
 import pyperclip
 #NEED TO CHECK I NEED ALL OF THESE, THEY'VE BEEN COPIED FROM THE PREVIOUS ITERATION OF THIS PROJECT, WHICH ITSELF WAS BASED ON A GUIDE FOR CREATING SYSTEM TRAY TOOLS
 #https://www.tutorialspoint.com/how-to-make-a-system-tray-application-in-tkinter
-
+debug = False
 
 def parser(coms):
     #the list of commands we take from the User interface  will include psudo-code-like "FOREACH/ENDFOR" commands, similar to jinja etc (but way more simplistic)
@@ -61,6 +61,8 @@ def run_queue(queue,in_text):
                 intermediary.append(run_queue(task,el))#this is either action on each char or list element, and either outputs a list or string
                 #however, to make it possible to manage, the intermediary is always a list, so if user is not careful, they could get lists of lists
                 #some thought is needed in how to guide the user to avoid this so they don't make broken task queues
+                if debug:
+                    print(task,working_text)
             working_text = intermediary
         elif task == 'STRIPWHITESPACE':
             working_text = strip_whitespace(working_text)
@@ -84,6 +86,21 @@ def run_queue(queue,in_text):
             working_text = remove_empty(working_text)
         elif task == 'UNESCAPESPECIALS':
             working_text = unescape_specials(working_text)
+        elif task == 'REVERSETABLE':
+            #SHOULD ADD SOME ERROR CHECKING HERE!!!
+            working_text = reverse_table(working_text)
+        elif 'LISTTOTABLE' in task:
+            if len(task.split(':')) > 1:
+                working_text = list_to_table(working_text,delim=task.split(':')[1])
+            else:
+                working_text = list_to_table(working_text)#default delim is comma
+        elif 'GETCOLUMN' in task:
+            if len(task.split(':')) > 1:
+                working_text = get_column(working_text,task.split(':')[1])
+            else:
+                working_text = list_to_table(working_text,'0')#default delim is comma
+        if debug:
+            print(task,working_text)
     return working_text
 
 
