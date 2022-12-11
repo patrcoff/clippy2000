@@ -25,8 +25,8 @@ class App():
 
     def process_queue(self,queue_ref,icon,item):#SO THIS WAS THE BLOODY PROBLEM, pystray item IS PASSING ITSELF AND ICON INTO THE FUNCTION, EVEN THOUGH IT'S IN A PARTIAL...?
         in_text = pyperclip.paste()
-        commands = self.get_commands()
-        pyperclip.copy(run_queue(parser(commands[queue_ref]),in_text))#BECAUSE THE SUBMENU ITEMS ARE PASSING THE MENU OBJECTS TO THIS FUNCTION, INSTEAD OF JUST THE STRING NAME OF THE KEY FROM THE DICT, WE NEED TO USE THE .text attr OF MENU OBJ
+        #commands = self.get_commands()
+        pyperclip.copy(run_queue(parser(self.commands[queue_ref]),in_text))
 
 
     def quit_window(self,icon,item):
@@ -37,9 +37,10 @@ class App():
         self.icon.stop()
         self.win.after(0,self.win.deiconify())
 
-    def hide_window(self,commands):
-
-        submenu = Menu(lambda: (item(x,partial(self.process_queue,x)) for x in commands))#I DON'T UNDERSTAND WHY BUT THIS IS NOT PASSING X (AS IN THE KEY FROM DICT COMMANDS) TO process_queue, BUT INSTEAD IS PASSING THE MENU OBJECT...
+    def hide_window(self):
+        print("Running hide_window")
+        self.get_commands()#refresh the commands lists
+        submenu = Menu(lambda: (item(x,partial(self.process_queue,x)) for x in self.commands))
         self.win.withdraw()
         image=Image.open("favicon.ico")
         menu=(item('Editor', self.show_window),
@@ -49,18 +50,21 @@ class App():
         self.icon=pystray.Icon("name", image, "My System Tray Icon", menu)
         self.icon.run()
 
-    def get_commands(self):#THIS WILL BE USED TO GET FROM USER SETTINGS
+    def get_commands(self):#THIS WILL BE USED TO GET FROM USER SETTINGS FROM FILE
         #commands = self.commands
+
+        #FOR NOW WE'RE JUST CHECKING IF IT WILL WORK TO EDIT THE SUBMENUS AFTER CLOSNING THE EDITOR EACH TIME
         if self.count == 2:
+            print("We've clicking this twice!")
             self.commands['Additional!'] = ['LINESMANYTOONE','STRINGTOLIST:,','REMOVEEMPTY','LISTTOSTRING: | ']
         self.count += 1
-        return self.commands
+        #return self.commands
 
     def run_app(self):
-        commands = self.get_commands()
+        #commands = self.get_commands()
         #THE ABOVE IS TO BE REPLACED WITH A USER CONFIG LOADING/SAVING MECHANISM
 
-        self.win.protocol('WM_DELETE_WINDOW', partial(self.hide_window,commands))#when window is closed by user, the hide_window function runs (the systray function)
+        self.win.protocol('WM_DELETE_WINDOW', partial(self.hide_window))#when window is closed by user, the hide_window function runs (the systray function)
 
         self.win.mainloop()
 
