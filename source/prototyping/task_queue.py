@@ -2,7 +2,7 @@ from string_converters import *
 import pyperclip
 #NEED TO CHECK I NEED ALL OF THESE, THEY'VE BEEN COPIED FROM THE PREVIOUS ITERATION OF THIS PROJECT, WHICH ITSELF WAS BASED ON A GUIDE FOR CREATING SYSTEM TRAY TOOLS
 #https://www.tutorialspoint.com/how-to-make-a-system-tray-application-in-tkinter
-debug = False
+
 
 def parser(coms):
     #the list of commands we take from the User interface  will include psudo-code-like "FOREACH/ENDFOR" commands, similar to jinja etc (but way more simplistic)
@@ -33,7 +33,7 @@ def parser(coms):
             out_list.append(el)
     return out_list
 
-def run_queue(queue,in_text):
+def run_queue(queue,in_text,debug=False):
     #again, we're using recursion (see note at start of parser function)
     #so, from the parsed command list we will have a list potentially containing 'sub lists'
     #each 'sub-list' is our implementation of a FOR-LOOP (from the standpoint of how the user chains 'commands'/'tasks' together)
@@ -108,7 +108,7 @@ def run_queue(queue,in_text):
 
 #command sequences will be saved in a json file and loaded at runtime
 #we will have an import function to import commands from a json file x into the system settings file (basically the json file in 'install' location) to allow for user sharing of command lists.
-available_commands = {''}
+builtin_commands = {''}
 
 def command_lists_from_file(filepath):
     pass

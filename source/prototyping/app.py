@@ -21,7 +21,7 @@ def hide_window(win,commands):
     submenu = Menu(lambda: (item(x,partial(process_queue,commands[x])) for x in commands))#I DON'T UNDERSTAND WHY BUT THIS IS NOT PASSING X (AS IN THE KEY FROM DICT COMMANDS) TO process_queue, BUT INSTEAD IS PASSING THE MENU OBJECT...
     win.withdraw()
     image=Image.open("favicon.ico")
-    menu=(item('Quit', quit_window),
+    menu=(item('Editor', partial(show_window,win)),
         #item('Lines: Many to one', lines_many_to_one),#some inbuilt commands do not need chaining if they directly map to a single function (but should we alloW this?)
         item('Tasks:',submenu),
         item('Quit!',quit_window))
@@ -34,15 +34,17 @@ def quit_window(icon, item):
     icon.stop()
     win.destroy()
 
-def show_window(icon, item):
+def show_window(icon, item,win):
     icon.stop()
     win.after(0,win.deiconify())
-
+count = 0
 def get_commands():#THIS WILL BE USED TO GET FROM USER SETTINGS
     commands = {'TASK1':['LINESMANYTOONE','STRINGTOLIST:,','REMOVEEMPTY','LISTTOSTRING: | '],
     'TASK2':['LINESMANYTOONE','STRINGTOLIST:,','REMOVEEMPTY','LISTTOSTRING: | '],
     'TASK3':['LINESMANYTOONE','STRINGTOLIST:,','REMOVEEMPTY','LISTTOSTRING: | '],
     'TASK4':['STRINGTOLIST:\n','REMOVEEMPTY','LISTTOTABLE','REVERSETABLE','GETCOLUMN:KB','LISTTOSTRING:\n']}
+    if count == 3:
+        commands['Additional!'] = ['LINESMANYTOONE','STRINGTOLIST:,','REMOVEEMPTY','LISTTOSTRING: | ']
     return commands
 
 
@@ -60,7 +62,7 @@ def main():
 
 
 
-    win.protocol('WM_DELETE_WINDOW', partial(hide_window,win,commands))
+    win.protocol('WM_DELETE_WINDOW', partial(hide_window,win,commands))#when window is closed by user, the hide_window function runs (the systray function)
 
     win.mainloop()
 
