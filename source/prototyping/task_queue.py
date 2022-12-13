@@ -89,6 +89,10 @@ def run_queue(queue,in_text,debug=False):
         elif task == 'REVERSETABLE':
             #SHOULD ADD SOME ERROR CHECKING HERE!!!
             working_text = reverse_table(working_text)
+        elif 'REMOVE:' in task:
+            if len(task.split(':')) > 1:
+                working_text = remove_y(working_text,task.split(':')[1])
+            #should add error checking if :val not passed
         elif 'LISTTOTABLE' in task:
             if len(task.split(':')) > 1:
                 working_text = list_to_table(working_text,delim=task.split(':')[1])

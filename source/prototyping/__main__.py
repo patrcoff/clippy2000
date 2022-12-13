@@ -11,7 +11,7 @@ from PIL import Image, ImageTk
 class App():
 
     def __init__(self,debug=False):
-        self.debug = debug
+        self.debug = debug#not currently passed to functions!
         self.count = 0
         self.win=Tk()
 
@@ -19,14 +19,14 @@ class App():
         # Set the size of the window
         self.win.geometry("700x350")
         self.commands = {'TASK1':['LINESMANYTOONE','STRINGTOLIST:,','REMOVEEMPTY','LISTTOSTRING: | '],
-        'TASK2':['LINESMANYTOONE','STRINGTOLIST:,','REMOVEEMPTY','LISTTOSTRING: | '],
+        'CodefromRP':['STRINGTOLIST:\n','FOREACH','REMOVE:>>> ','REMOVE:... ','ENDFOR','LISTTOSTRING:\n'],
         'TASK3':['LINESMANYTOONE','STRINGTOLIST:,','REMOVEEMPTY','LISTTOSTRING: | '],
         'TASK4':['STRINGTOLIST:\n','REMOVEEMPTY','LISTTOTABLE','REVERSETABLE','GETCOLUMN:KB','LISTTOSTRING:\n']}
 
     def process_queue(self,queue_ref,icon,item):#SO THIS WAS THE BLOODY PROBLEM, pystray item IS PASSING ITSELF AND ICON INTO THE FUNCTION, EVEN THOUGH IT'S IN A PARTIAL...?
         in_text = pyperclip.paste()
         #commands = self.get_commands()
-        pyperclip.copy(run_queue(parser(self.commands[queue_ref]),in_text))
+        pyperclip.copy(run_queue(parser(self.commands[queue_ref]),in_text,debug=self.debug))
 
 
     def quit_window(self,icon,item):
@@ -70,7 +70,7 @@ class App():
 
 
 def main():
-    app = App()
+    app = App(debug=True)
     app.run_app()
 
 if __name__ == '__main__':
