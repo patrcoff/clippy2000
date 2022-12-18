@@ -49,7 +49,10 @@ class App():
         coms = list(self.commands.keys())
         clicked = StringVar()
         clicked.set(coms[0])
-        commands_list = OptionMenu(self.win,clicked,*coms)#https://www.geeksforgeeks.org/dropdown-menus-tkinter/
+        label = Label(self.win,text=clicked.get())#the view below the dropdown and button
+        def refresh_list(selected):
+            label.config(text=self.commands[selected])
+        commands_list = OptionMenu(self.win,clicked,*coms,command=refresh_list)#https://www.geeksforgeeks.org/dropdown-menus-tkinter/
         commands_list.pack()
 
         #ADD A NEW OPTION TO THE LIST OF COMMAND CHAINS
@@ -64,6 +67,8 @@ class App():
         #----------------------------------------------
 
         #NOW CREATE A VIEW WHICH SHOWS THE COMMANDS IN THE CURRENTLY SELECTED COMMAND QUEUE
+        
+        label.pack()
 
         self.win.after(0,self.win.deiconify())
 
