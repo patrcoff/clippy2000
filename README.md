@@ -1,6 +1,8 @@
 # clippy2000
 A clipboard content processor system tray tool written in Python
 
+*This is a pre-alpha version of this project, which is a precursor to my 2023 new year resolution to create one project a month. 
+
 Purpose: Often I find myself needing to perform some manual admin task involving a lot of copy/pasting of text from various sources into various different applications.
          Sometimes however, the formatting of the copied text needs to be processed in some way for the intended purpose. For instance, I may need to copy multiple lines of text but paste them into a single line.
          An example might be a list of email addresses provided in a given format, which need to be pasted into one line, separated by commas. There are endless other examples of such inefficient tasks we all do each day, often performed manually using basic tools like a text editor as an intermediary between applications. This is of course fine for one off tasks, but once you start to need to repeat such manual tasks over and over, the pain of doing even small repetitions grows more and more unbearable.
