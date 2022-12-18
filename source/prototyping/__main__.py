@@ -35,7 +35,7 @@ class App():
         self.icon.stop()
         self.win.destroy()
 
-    def show_window(self,icon,item):
+    def show_window(self,icon,item):#the main GUI window is configured here
         self.icon.stop()
         #let's add the GUI command editor here -------------------||
         for widget in self.win.winfo_children():#clear the window
@@ -53,7 +53,7 @@ class App():
         def refresh_list(selected):
             label.config(text=self.commands[selected])
         commands_list = OptionMenu(self.win,clicked,*coms,command=refresh_list)#https://www.geeksforgeeks.org/dropdown-menus-tkinter/
-        commands_list.pack()
+
 
         #ADD A NEW OPTION TO THE LIST OF COMMAND CHAINS
         def add_option():
@@ -63,14 +63,18 @@ class App():
             #self.quit_window(icon,item)
             self.show_window(icon,item)
         add_option_btn = Button(self.win,text='New',command = add_option)
-        add_option_btn.pack()
+
         #----------------------------------------------
 
-        #NOW CREATE A VIEW WHICH SHOWS THE COMMANDS IN THE CURRENTLY SELECTED COMMAND QUEUE
+
+        #VIEWS
         
+        commands_list.pack()
+        add_option_btn.pack()
         label.pack()
 
         self.win.after(0,self.win.deiconify())
+#-----------------------------------------------------------------------
 
     def hide_window(self):
         print("Running hide_window")
