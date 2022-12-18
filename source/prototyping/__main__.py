@@ -1,4 +1,6 @@
 from tkinter import *
+#from tkinter import ttk
+from tkinter import simpledialog
 from functools import partial
 from task_queue import *
 from pystray import Menu, MenuItem as item
@@ -35,6 +37,34 @@ class App():
 
     def show_window(self,icon,item):
         self.icon.stop()
+        #let's add the GUI command editor here -------------------||
+        for widget in self.win.winfo_children():#clear the window
+            widget.destroy()
+        #then we'd add the widgets needed to edit the command queues
+
+        #GET COMMANDS FROM FILE
+        #skip for now
+
+        #DROPDOWN LIST OF COMMANDS
+        coms = list(self.commands.keys())
+        clicked = StringVar()
+        clicked.set(coms[0])
+        commands_list = OptionMenu(self.win,clicked,*coms)#https://www.geeksforgeeks.org/dropdown-menus-tkinter/
+        commands_list.pack()
+
+        #ADD A NEW OPTION TO THE LIST OF COMMAND CHAINS
+        def add_option():
+            USER_INP = simpledialog.askstring(title="New command queue:",prompt="Enter unique name for command queue:")
+            print(USER_INP)
+            self.commands[USER_INP] = []
+            #self.quit_window(icon,item)
+            self.show_window(icon,item)
+        add_option_btn = Button(self.win,text='New',command = add_option)
+        add_option_btn.pack()
+        #----------------------------------------------
+
+        #NOW CREATE A VIEW WHICH SHOWS THE COMMANDS IN THE CURRENTLY SELECTED COMMAND QUEUE
+
         self.win.after(0,self.win.deiconify())
 
     def hide_window(self):
@@ -65,6 +95,7 @@ class App():
         #THE ABOVE IS TO BE REPLACED WITH A USER CONFIG LOADING/SAVING MECHANISM
 
         self.win.protocol('WM_DELETE_WINDOW', partial(self.hide_window))#when window is closed by user, the hide_window function runs (the systray function)
+
 
         self.win.mainloop()
 
