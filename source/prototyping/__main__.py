@@ -19,7 +19,7 @@ class App():
         # Set the size of the window
         self.win.geometry("700x350")
         self.commands = {'TASK1':['LINESMANYTOONE','STRINGTOLIST:,','REMOVEEMPTY','LISTTOSTRING: | '],
-        'CodefromRP':['STRINGTOLIST:\n','FOREACH','REMOVE:>>> ','REMOVE:... ','ENDFOR','LISTTOSTRING:\n'],
+        'CodefromRP':['STRINGTOLIST:\n','FOREACH','REMOVE:>>> ','REMOVE:... ','ENDFOR','LISTTOSTRING:\n'],#this is for copying code from realpython where lines start with the repl >>> and ... symbols
         'TASK3':['LINESMANYTOONE','STRINGTOLIST:,','REMOVEEMPTY','LISTTOSTRING: | '],
         'TASK4':['STRINGTOLIST:\n','REMOVEEMPTY','LISTTOTABLE','REVERSETABLE','GETCOLUMN:KB','LISTTOSTRING:\n']}
 
