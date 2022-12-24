@@ -46,18 +46,23 @@ class TaskQueue():
                 out_list.append(el)
         return out_list
 
-    def count_colons(word):
+    def count_colons(self,word):
         return word.count(':')
 
     def call_task(self,task,working_text):
         tasks = self.tasks
         #count number of values passed to task (number of colons)
+        if task.split(':')[0] not in tasks.keys():
+            print(task,'not in keys!')
         if self.count_colons(task) == 0:
-            working_text = partial(self.tasks[task.split(':')[0]])
+            print('\nworkingtext:\n',working_text)   
+            working_text = partial(tasks[task.split(':')[0]],working_text)()
         elif self.count_colons(task) == 1:
-            working_text = partial(self.tasks[task.split(':')[0]],task.split(':')[1])
+            working_text = partial(tasks[task.split(':')[0]],working_text,task.split(':')[1])()
         elif self.count_colons(task) == 2:
-            working_text = partial(self.tasks[task.split(':')[0]],task.split(':')[1],task.split(':')[2])      
+            working_text = partial(tasks[task.split(':')[0]],working_text,task.split(':')[1],task.split(':')[2])()
+
+        return working_text      
         #this function massively reduces the code needed in run_queue, and is better at DRY
         #however, it has removed the functionality of using named 'arguments' - so the code creating tasks will
         #need to carefully enforce the order of 'arguments' passed to the task

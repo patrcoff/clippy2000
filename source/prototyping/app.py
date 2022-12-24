@@ -10,7 +10,8 @@ from task_queue import *
 class App():
     pass
 
-    #requied functionality
+    #required functionality:
+    
     #load config
     #build systray and editor window in qt
     #save config (config will be handled in task_queue module and called here to keep sepatation between the text processing and config saving, and interface sides)
