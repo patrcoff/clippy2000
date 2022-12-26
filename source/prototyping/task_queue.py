@@ -1,11 +1,40 @@
 from string_converters import *
 import pyperclip
 from functools import partial
+import json
+import pathlib
+#import 
 #NEED TO CHECK I NEED ALL OF THESE, THEY'VE BEEN COPIED FROM THE PREVIOUS ITERATION OF THIS PROJECT, WHICH ITSELF WAS BASED ON A GUIDE FOR CREATING SYSTEM TRAY TOOLS
 #https://www.tutorialspoint.com/how-to-make-a-system-tray-application-in-tkinter
 
 class Config():
-    pass
+    def __init__(self,settings_location=None) -> None:
+        self.task_queue = {'TASK1':['LINESMANYTOONE','STRINGTOLIST:,','REMOVEEMPTY','LISTTOSTRING: | ','STRIPWHITESPACE'],
+                          'CodefromRP':['STRINGTOLIST:\n','FOREACH','REMOVE:>>> ','REMOVE:... ','ENDFOR','LISTTOSTRING:\n'],#this is for copying code from realpython where lines start with the repl >>> and ... symbols
+                           'TASK3':['LINESMANYTOONE','STRINGTOLIST:,','REMOVEEMPTY','LISTTOSTRING: | ']
+            }
+        if settings_location:
+            try:
+                path = pathlib.Path(settings_location)
+                print(path)
+                self.tq_filepath = path.joinpath('task_queue.json')
+                print(self.tq_filepath)
+                if self.tq_filepath.exists():#if the file already exists, load the settings from it instead of just using the built-ins
+                    with open('task_queue.json','r') as file:
+                        self.task_queue = json.load(file)
+                else:#set config file with default task queue hardcoded above (as we've been passed a dir but the file didn't exist yet)
+                    with open('task_queue.json','w') as file:
+                        json.dump(self.task_queue,file)
+            except:
+                print('FAILED TO LOAD SETTINGS JSON FILE')
+        else:
+            self.tq_filepath = None
+            #UI can use to then prompt the user for a settings location should they try and save task queues later
+    
+    def load_task_queue():
+        pass
+    def save_task_queue():
+        pass
     #load and save config
 
 class TaskQueue():
