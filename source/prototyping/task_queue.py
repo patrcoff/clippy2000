@@ -20,10 +20,10 @@ class Config():
                 self.tq_filepath = path.joinpath('task_queue.json')
                 print(self.tq_filepath)
                 if self.tq_filepath.exists():#if the file already exists, load the settings from it instead of just using the built-ins
-                    with open('task_queue.json','r') as file:
+                    with open(self.tq_filepath,'r') as file:
                         self.task_queue = json.load(file)
                 else:#set config file with default task queue hardcoded above (as we've been passed a dir but the file didn't exist yet)
-                    with open('task_queue.json','w') as file:
+                    with open(self.tq_filepath,'w') as file:
                         json.dump(self.task_queue,file)
             except:
                 print('FAILED TO LOAD SETTINGS JSON FILE')
@@ -31,8 +31,10 @@ class Config():
             self.tq_filepath = None
             #UI can use to then prompt the user for a settings location should they try and save task queues later
     
-    def load_task_queue():
-        pass
+    def load_task_queue(self):
+        with open(self.tq_filepath,'r') as file:
+            self.task_queue = json.load(file)
+    
     def save_task_queue():
         pass
     #load and save config

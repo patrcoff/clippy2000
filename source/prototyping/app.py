@@ -18,14 +18,16 @@ class App(QMainWindow):
         #,config=Config(pathlib.Path(r'./'))
         self.config = Config(pathlib.Path(r'./'))#will impliment different defaults for different OS's later
         #for now is just the directory it runs from which should be source/prototyping for now
-
+        self.taskQueue = TaskQueue()
         self.initUI()
+        self.debug = True
 
     def print_config(self):
         print(self.config.task_queue)
 
-    def load_config():
-        pass
+    def load_config(self):
+        self.config.load_task_queue()
+
     def save_config():
         pass
     #load config
@@ -57,10 +59,10 @@ class App(QMainWindow):
         #-----------------------------------------------------------------------
         p = QPushButton("Click Me", self)
         self.setCentralWidget(p)
-        p.clicked.connect(self.onClick)
+        p.clicked.connect(self.onClick)#PLACEHOLDER FOR EDITOR WINDOW
 
     def onClick(self):
-        print('fuck')
+        print('YAY!')
         #self.m.clear()
         #use the above if we're building the full menu from scratch (we probably will, unless we can address them by index?)
         #self.m.addAction('First')
@@ -69,12 +71,19 @@ class App(QMainWindow):
         #calling setContextMenu multiple times breaks the systray icon for some reason... just don't do it!
     
     def interim(self,var):#testing below functionality before creating intended function to call taskqueue
-        print(var)
+        #print(var)
+        in_text = pyperclip.paste()
+        pyperclip.copy(self.taskQueue.run_queue(self.taskQueue.parser(self.config.task_queue[var]),in_text,debug=self.debug))
+
 
     def refreshTrayMenu(self):
         
-        #firct self.m.clear()
+        self.m.clear()
+        self.m.addAction(self.first)
+
         #then read data structure object containing the list of command queues and their names
+        self.load_config()
+
         self.objectList = []#have figured out why QAction objects needed to be saved to an attribute of the main object
         #the addAction doesn't pass in a copy of an object, but a reference to an object, so the object (QAction) needs to 
         #keep existing - therefore we cann add these objects to a list which is itself an attribute of self - then they are
@@ -85,6 +94,7 @@ class App(QMainWindow):
             self.objectList.append(com)
         for i in range(len(self.objectList)):
             self.m.addAction(self.objectList[i])
+        self.m.addAction(self.second)
 
     def show_win(self):
         self.show()
