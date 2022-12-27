@@ -14,7 +14,7 @@ from PyQt6.QtWidgets import *
 
 class App(QMainWindow):
     def __init__(self):
-        super().__init__()
+        super(App, self).__init__()
         #,config=Config(pathlib.Path(r'./'))
         self.config = Config(pathlib.Path(r'./'))#will impliment different defaults for different OS's later
         #for now is just the directory it runs from which should be source/prototyping for now
@@ -31,38 +31,51 @@ class App(QMainWindow):
     #load config
     #save config (config will be handled in task_queue module and called here to keep sepatation between the text processing and config saving, and interface sides)
 
+    #def add_sys_menu(self,menu,tray):
+
     def initUI(self):#we need to modify this to create our editor window
 
+        icon = QIcon("favicon.ico")
+        self.tray = QSystemTrayIcon(self)
+        self.tray.setIcon(icon)
+        self.m = QMenu()
+        self.first = QAction('edit menu')
+        self.first.triggered.connect(self.onClick)
+        self.m.addAction(self.first)
+        self.m.addAction('Show window')
+        self.tray.setContextMenu(self.m)
+        self.tray.show()
         textEdit = QTextEdit()
         self.setCentralWidget(textEdit)
+        #-----------------------------------------------------------------------
+        p = QPushButton("Click Me", self)
+        self.setCentralWidget(p)
+        p.clicked.connect(self.onClick)
 
-        exitAct = QAction(QIcon('exit24.png'), 'Exit', self)
-        exitAct.setShortcut('Ctrl+Q')
-        exitAct.setStatusTip('Exit application')
-        exitAct.triggered.connect(self.close)
-
-        self.statusBar()
-
-        menubar = self.menuBar()
-        fileMenu = menubar.addMenu('&File')
-        fileMenu.addAction(exitAct)
-
-        toolbar = self.addToolBar('Exit')
-        toolbar.addAction(exitAct)
-
-        self.setGeometry(300, 300, 350, 250)
-        self.setWindowTitle('Main window')
-        #self.show()
-        #don't show on start
+    def onClick(self):
+        print('fuck')
+        #self.m.clear()
+        #use the above if we're building the full menu from scratch (we probably will, unless we can address them by index?)
+        #self.m.addAction('First')
+        self.m.addAction('Third')
+        #self.tray.setContextMenu(self.m)
+        #calling setContextMenu multiple times breaks the systray icon for some reason... just don't do it!
     
-    #def show_win(self):
-     #   self.show()
+    def show_win(self):
+        self.show()
 
     #build systray outside of class - doesn't work in class for some reason...
     #https://www.pythonguis.com/tutorials/pyqt6-system-tray-mac-menu-bar-applications/
 
 
 
+def main():
+    app = QApplication(sys.argv)
+    app.setQuitOnLastWindowClosed(False)
+    win = App()
+    sys.exit(app.exec())
+
+"""
 def main():
     
     #win.print_config()
@@ -79,7 +92,8 @@ def main():
     menu = QMenu()
 
     action = QAction("A menu item")
-    action.triggered.connect(win.show)
+    func = partial(add_sys_menu,win,menu,tray)
+    action.triggered.connect(func)
     menu.addAction(action)
 
     # Add a Quit option to the menu.
@@ -89,7 +103,8 @@ def main():
 
     tray.setContextMenu(menu)
     app.exec()
+"""
 
 if __name__ == '__main__':
-    print('ismain')
+    #print('ismain')
     main()
