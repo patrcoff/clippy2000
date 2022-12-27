@@ -39,11 +39,18 @@ class App(QMainWindow):
         self.tray = QSystemTrayIcon(self)
         self.tray.setIcon(icon)
         self.m = QMenu()
+        
         self.first = QAction('edit menu')
         self.first.triggered.connect(self.onClick)
         self.m.addAction(self.first)
-        self.m.addAction('Show window')
+        
+        self.second = QAction('refresh tray')
+        self.second.triggered.connect(self.refreshTrayMenu)
+        self.m.addAction(self.second)
+        
+
         self.tray.setContextMenu(self.m)
+        
         self.tray.show()
         textEdit = QTextEdit()
         self.setCentralWidget(textEdit)
@@ -61,6 +68,24 @@ class App(QMainWindow):
         #self.tray.setContextMenu(self.m)
         #calling setContextMenu multiple times breaks the systray icon for some reason... just don't do it!
     
+    def interim(self,var):#testing below functionality before creating intended function to call taskqueue
+        print(var)
+
+    def refreshTrayMenu(self):
+        
+        #firct self.m.clear()
+        #then read data structure object containing the list of command queues and their names
+        self.objectList = []#have figured out why QAction objects needed to be saved to an attribute of the main object
+        #the addAction doesn't pass in a copy of an object, but a reference to an object, so the object (QAction) needs to 
+        #keep existing - therefore we cann add these objects to a list which is itself an attribute of self - then they are
+        #always available and don't get lost in the method scope
+        for taskQueue in self.config.task_queue:#this is only adding the last one, not using self.com doesn't work though
+            com = QAction(taskQueue)
+            com.triggered.connect(partial(self.interim,taskQueue))
+            self.objectList.append(com)
+        for i in range(len(self.objectList)):
+            self.m.addAction(self.objectList[i])
+
     def show_win(self):
         self.show()
 
