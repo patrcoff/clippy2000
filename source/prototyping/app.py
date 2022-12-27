@@ -13,6 +13,33 @@ from PyQt6.QtWidgets import *
 
 
 class App(QMainWindow):
+    '''
+    The main window class for the QT based GUI app of \'clipp2000\' - inherits from QMainWindow
+
+    ...
+    Attributes
+    ----------
+    config : task_queue.Config
+        config object of task_queue module which contains saved task queues
+    taskQueue : task_queue.TaskQueue
+        TaskQueue object which holds the available tasks as well as methods to parse and run task queues
+    debug : bool
+        Used to determine whether user debug mode is used by TaskQueue object methods
+    tray : QSystemTrayIcon
+        System tray object from PyQt
+    first : QAction
+        The first entry in the system tray menu
+    second : QAction
+        The last entry in the system tray menu
+    m : QMenu
+        The menu object of the system tray icon
+    objectList : list
+        A dynamically populated list of QAction menu objects populated from user saved task queues in self.config
+
+    Methods
+    -------
+    load_config()
+    '''
     def __init__(self):
         super(App, self).__init__()
         #,config=Config(pathlib.Path(r'./'))

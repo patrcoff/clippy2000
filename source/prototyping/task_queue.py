@@ -12,7 +12,10 @@ class Config():
         self.task_queue = {'TASK1':['LINESMANYTOONE','STRINGTOLIST:,','REMOVEEMPTY','LISTTOSTRING: | ','STRIPWHITESPACE'],
                           'CodefromRP':['STRINGTOLIST:\n','FOREACH','REMOVE:>>> ','REMOVE:... ','ENDFOR','LISTTOSTRING:\n'],#this is for copying code from realpython where lines start with the repl >>> and ... symbols
                            'TASK3':['LINESMANYTOONE','STRINGTOLIST:,','REMOVEEMPTY','LISTTOSTRING: | ']
-            }
+            }#this is where we'll define the built-ins
+            #plan is to eventually also impliment:
+                #user saved (by json file)
+                #app-built-ins (i.e. different UI apps may have different built-ins as per the niche use cases e.g. cli vs gui)
         if settings_location:
             try:
                 path = pathlib.Path(settings_location)
