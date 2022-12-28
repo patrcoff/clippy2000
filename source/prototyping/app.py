@@ -152,37 +152,6 @@ def main():
     win = App()
     sys.exit(app.exec())
 
-
-"""
-def main():
-    
-    #win.print_config()
-    app = QApplication([])
-    app.setQuitOnLastWindowClosed(False)
-
-    win = App()
-
-    icon = QIcon("favicon.ico")
-    tray = QSystemTrayIcon()
-    tray.setIcon(icon)
-    tray.setVisible(True)
-
-    menu = QMenu()
-
-    action = QAction("A menu item")
-    func = partial(add_sys_menu,win,menu,tray)
-    action.triggered.connect(func)
-    menu.addAction(action)
-
-    # Add a Quit option to the menu.
-    quit = QAction("Quit")
-    quit.triggered.connect(app.quit)
-    menu.addAction(quit)
-
-    tray.setContextMenu(menu)
-    app.exec()
-"""
-
 if __name__ == "__main__":
     # print('ismain')
     main()

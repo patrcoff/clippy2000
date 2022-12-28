@@ -46,23 +46,29 @@ class Config:
                 if (
                     self.tq_filepath.exists()
                 ):  # if the file already exists, load the settings from it instead of just using the built-ins
-                    with open(self.tq_filepath, "r") as file:
-                        self.task_queue = json.load(file)
+                    self.load_task_queue()
+                    #with open(self.tq_filepath, "r") as file:
+                    #    self.task_queue = json.load(file)
                 else:  # set config file with default task queue hardcoded above (as we've been passed a dir but the file didn't exist yet)
-                    with open(self.tq_filepath, "w") as file:
-                        json.dump(self.task_queue, file)
+                    self.save_task_queue()
+                    #with open(self.tq_filepath, "w") as file:
+                    #    json.dump(self.task_queue, file)
             except:
                 print("FAILED TO LOAD SETTINGS JSON FILE")
         else:
             self.tq_filepath = None
             # UI can use to then prompt the user for a settings location should they try and save task queues later
 
+    def set_tq_filepath(self,fp):
+        self.tq_filepath = fp
+
     def load_task_queue(self):
         with open(self.tq_filepath, "r") as file:
             self.task_queue = json.load(file)
 
-    def save_task_queue():
-        pass
+    def save_task_queue(self):
+        with open(self.tq_filepath, "w") as file:
+            json.dump(self.task_queue,file)
 
     # load and save config
 
@@ -245,33 +251,3 @@ class TaskQueue:
         return working_text
 
 
-# command sequences will be saved in a json file and loaded at runtime
-# we will have an import function to import commands from a json file x into the system settings file (basically the json file in 'install' location) to allow for user sharing of command lists.
-builtin_commands = {""}
-
-
-def command_lists_from_file(filepath):
-    pass
-
-
-def export_command_lists_to_file(list_of_command_lists):
-    pass
-
-
-def load_settings(filepath="./app_settings.json"):
-    pass
-
-
-# BASIC TESTING
-# here we shall perform some testing of the functions and the command queue mechanism, outside of GUI operation.
-
-"""
-commands = ['LINESMANYTOONE','STRINGTOLIST:,','REMOVEEMPTY','LISTTOSTRING: | ']
-parsed_commands = parser(commands)
-
-print(run_queue(parsed_commands,text))
-
-print(" ----------- ")
-input("Copy text now")
-print(run_queue(parser(['STRIPWHITESPACE']),pyperclip.paste()))
-"""
