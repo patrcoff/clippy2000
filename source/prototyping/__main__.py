@@ -73,7 +73,7 @@ class App(QMainWindow):
         self.m = QMenu()
 
         self.first = QAction("edit menu")
-        self.first.triggered.connect(self.onClick)
+        self.first.triggered.connect(self.show)
         self.m.addAction(self.first)
 
         self.second = QAction("refresh tray")
@@ -83,12 +83,26 @@ class App(QMainWindow):
         self.tray.setContextMenu(self.m)
 
         self.tray.show()
-        textEdit = QTextEdit()
-        self.setCentralWidget(textEdit)
-        # -----------------------------------------------------------------------
-        p = QPushButton("Click Me", self)
-        self.setCentralWidget(p)
-        p.clicked.connect(self.onClick)  # PLACEHOLDER FOR EDITOR WINDOW
+        #------------------------------------------------------------------------
+        #NEXT UP: CREATE A WINDOW TO SHOW THE SAVED TASK QUEUES, WITH A DESCRIPTION OF EACH
+        #AND THEN A WINDOW FOR EDITING THE INDIVIDUAL TASK QUEUES
+        layout = QVBoxLayout()
+        centralWidget = QWidget(self)
+        centralWidget.setLayout(layout)
+        self.keys = [x for x in self.config.task_queue]
+        print(self.keys)
+        for i in range(len(self.keys)):
+            layout.addWidget(QLabel(self.keys[i-1]))
+            #self.sryj(QLabel(self.keys[i-1]))
+        #self.setLayout(self.layout)
+        #textEdit = QTextEdit()
+        self.setCentralWidget(centralWidget)
+ 
+        #p = QPushButton("Click Me", self)
+        #self.setCentralWidget(p)
+        #p.clicked.connect(self.onClick)  # PLACEHOLDER FOR EDITOR WINDOW
+       # -----------------------------------------------------------------------
+
 
     def onClick(self):
         print("YAY!")
