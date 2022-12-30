@@ -4,12 +4,7 @@ from functools import partial
 import json
 import pathlib
 
-# import
-# NEED TO CHECK I NEED ALL OF THESE, THEY'VE BEEN COPIED FROM THE PREVIOUS ITERATION OF THIS PROJECT, WHICH ITSELF WAS BASED ON A GUIDE FOR CREATING SYSTEM TRAY TOOLS
-# https://www.tutorialspoint.com/how-to-make-a-system-tray-application-in-tkinter
-
-
-class Config:
+class UserConfig:
     def __init__(self, settings_location=None) -> None:
         self.task_queue = {
             "TASK1": [
@@ -26,13 +21,13 @@ class Config:
                 "REMOVE:... ",
                 "ENDFOR",
                 "LISTTOSTRING:\n",
-            ],  # this is for copying code from realpython where lines start with the repl >>> and ... symbols
+            ],  # this is for copying code from realpython repl blocks where lines start with the repl >>> and ... symbols
             "TASK3": [
                 "LINESMANYTOONE",
                 "STRINGTOLIST:,",
                 "REMOVEEMPTY",
                 "LISTTOSTRING: | ",
-            ],
+            ],#the other two taskqueues here are arbitrary but valid (in terms of input/output datatypes)
         }  # this is where we'll define the built-ins
         # plan is to eventually also impliment:
         # user saved (by json file)
@@ -40,9 +35,11 @@ class Config:
         if settings_location:
             try:
                 path = pathlib.Path(settings_location)
-                print(path)
-                self.tq_filepath = path.joinpath("task_queue.json")
-                print(self.tq_filepath)
+
+                if not path.exists():
+                    pathlib.Path(path).mkdir(parents=True)
+
+                self.tq_filepath = path / "user_task_queues.json"
                 if (
                     self.tq_filepath.exists()
                 ):  # if the file already exists, load the settings from it instead of just using the built-ins
@@ -55,11 +52,24 @@ class Config:
                     #    json.dump(self.task_queue, file)
             except:
                 print("FAILED TO LOAD SETTINGS JSON FILE")
-        else:
-            self.tq_filepath = None
+        else:#defaults to module dir
+            self.tq_filepath = pathlib.Path(__file__).parent.resolve() / "user_task_queues.json"
+            if (
+                self.tq_filepath.exists()
+            ):  # if the file already exists, load the settings from it instead of just using the built-ins
+                self.load_task_queue()
+                #with open(self.tq_filepath, "r") as file:
+                #    self.task_queue = json.load(file)
+            else:  # set config file with default task queue hardcoded above (as we've been passed a dir but the file didn't exist yet)
+                self.save_task_queue()
+                #with open(self.tq_filepath, "w") as file:
+                #    json.dump(self.task_queue, file)
             # UI can use to then prompt the user for a settings location should they try and save task queues later
 
+    #not decided if below will be kept or not, was thinking for providing method to set filepath on instances of 
+    #class outside the module i.e. to allow user to set in gui, though this could simply be done by directly accessing attr...    
     def set_tq_filepath(self,fp):
+        """Takes in a pathlib.filepath object to set tq_filepath attr"""
         self.tq_filepath = fp
 
     def load_task_queue(self):
@@ -74,9 +84,10 @@ class Config:
 
 
 class TaskQueue:
+    """A class to define the task queue functionality and available tasks."""
     def __init__(self) -> None:
-        self.tasks = {
-            "STRIPWHITESPACE": {"function": strip_whitespace, "arguments": 0},
+        self.tasks = {#every task has a a name, function, no of arguments, acceptable input types and output type used for chaining validation
+            "STRIPWHITESPACE": {"function": strip_whitespace, "arguments": 0,'input_types':['string'],'output_type':'string'},
             "UNESCAPESPECIALS": {"function": unescape_specials, "arguments": 0},
             "EXTRACTINTS": {"function": extract_ints, "arguments": 0},
             "STRINGTOLIST": {"function": string_to_list, "arguments": 1},

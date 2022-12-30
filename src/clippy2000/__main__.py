@@ -3,6 +3,7 @@ from task_queue import *
 import sys
 from PyQt6.QtGui import *
 from PyQt6.QtWidgets import *
+#from platform import platform
 
 # from pystray import Menu, MenuItem as item
 # import pystray
@@ -33,7 +34,7 @@ class App(QMainWindow):
     m : QMenu
         The menu object of the system tray icon
     objectList : list
-        A dynamically populated list of QAction menu objects populated from user saved task queues in self.config
+        A dynamically populated list of QAction menu objects populated from user saved task queues in self.user_config
 
     Methods
     -------
@@ -42,20 +43,23 @@ class App(QMainWindow):
 
     def __init__(self):
         super(App, self).__init__()
-        # ,config=Config(pathlib.Path(r'./'))
-        self.config = Config(
-            pathlib.Path(r"./")
-        )  # will impliment different defaults for different OS's later
-        # for now is just the directory it runs from which should be source/prototyping for now
+
+        #self.platform = platform()#not currently used but may decide to place config files in different locations depending on this
+
+        self.user_config = UserConfig(
+            pathlib.Path.home() / 'Clippy2000'
+        )
+
+
         self.taskQueue = TaskQueue()
         self.initUI()
         self.debug = True
 
     def print_config(self):
-        print(self.config.task_queue)
+        print(self.user_config.task_queue)
 
     def load_config(self):
-        self.config.load_task_queue()
+        self.user_config.load_task_queue()
 
     def save_config():
         pass
@@ -89,8 +93,8 @@ class App(QMainWindow):
         layout = QVBoxLayout()
         centralWidget = QWidget(self)
         centralWidget.setLayout(layout)
-        self.keys = [x for x in self.config.task_queue]
-        print(self.keys)
+        self.keys = [x for x in self.user_config.task_queue]
+        #print(self.keys)
         for i in range(len(self.keys)):
             layout.addWidget(QLabel(self.keys[i-1]))
             #self.sryj(QLabel(self.keys[i-1]))
@@ -120,7 +124,7 @@ class App(QMainWindow):
         in_text = pyperclip.paste()
         pyperclip.copy(
             self.taskQueue.run_queue(
-                self.taskQueue.parser(self.config.task_queue[var]),
+                self.taskQueue.parser(self.user_config.task_queue[var]),
                 in_text,
                 debug=self.debug,
             )
@@ -143,7 +147,7 @@ class App(QMainWindow):
         for (
             taskQueue
         ) in (
-            self.config.task_queue
+            self.user_config.task_queue
         ):  # this is only adding the last one, not using self.com doesn't work though
             com = QAction(taskQueue)
             com.triggered.connect(partial(self.interim, taskQueue))
