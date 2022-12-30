@@ -66,8 +66,8 @@ class App(QMainWindow):
     # def add_sys_menu(self,menu,tray):
 
     def initUI(self):  # we need to modify this to create our editor window
-
-        icon = QIcon("favicon.ico")
+        icon_path = pathlib.Path(__file__).parent.resolve() / "favicon.ico"#when we migrate this code out of 'prototyping dir' we will maybe add a module subdir for images etc
+        icon = QIcon(f'{icon_path}')
         self.tray = QSystemTrayIcon(self)
         self.tray.setIcon(icon)
         self.m = QMenu()
