@@ -141,11 +141,26 @@ class TaskQueue:
 
     def call_task(self, task, working_text):
         tasks = self.tasks
+        print(f'\ntask: {task} : colons : {self.count_colons(task)}')
         # count number of values passed to task (number of colons)
         if task.split(":")[0] not in tasks.keys():
             print(task, "not in keys!")
+
         if self.count_colons(task) == 0:
-            print("\nworkingtext:\n", working_text)
+            working_text = tasks[task.split(":")[0]]["function"](working_text)
+        elif self.count_colons(task) == 1:
+            working_text = tasks[task.split(":")[0]]["function"](working_text, task.split(":")[1])
+        elif self.count_colons(task) == 2:
+            working_text = tasks[task.split(":")[0]]["function"](
+                working_text,
+                task.split(":")[1],
+                task.split(":")[2],
+            )
+        #else:
+        #    print(f'\n\n{task}\n\n')
+            
+            """
+            print("\nworkingtext:\n", working_text)#why am I using partial here, surely that's not needed? hangover from tkinter implementation from earlier days?
             working_text = partial(
                 tasks[task.split(":")[0]]["function"], working_text
             )()
@@ -161,6 +176,8 @@ class TaskQueue:
                 task.split(":")[2],
             )()
             # need to figure out more complex logic to account for if a passed argument is itself a colon...!
+"""
+
 
         return working_text
         # this function massively reduces the code needed in run_queue, and is better at DRY
@@ -199,12 +216,12 @@ class TaskQueue:
                         print(task, working_text)
                 working_text = intermediary
             # --------------------------------------------------------------------------------------
-            elif task in self.tasks.keys():
+            elif task.split(':')[0] in self.tasks.keys():
                 # task is valid, process using dictionary
                 working_text = self.call_task(task, working_text)
             # so far we have one command in this new mechanism and if this works, we can start removing the below
             # --------------------------------------------------------------------------------------
-            elif task == "STRIPWHITESPACE":
+            """elif task == "STRIPWHITESPACE":
                 working_text = strip_whitespace(working_text)
             elif "STRINGTOLIST" in task:
                 splitter = task.split(":")[
@@ -257,8 +274,11 @@ class TaskQueue:
                     working_text = list_to_table(
                         working_text, "0"
                     )  # default delim is comma
+            #----------------------------------------------------------------------------------------------------------"""
+
             if debug:
                 print(task, working_text)
+
         return working_text
 
 

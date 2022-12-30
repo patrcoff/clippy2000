@@ -37,6 +37,7 @@ def extract_ints(x):  # need a float version of this...
 
 
 def string_to_list(x, splitter):
+    print(splitter)
     return x.split(splitter)
 
 
