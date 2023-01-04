@@ -4,6 +4,7 @@ from functools import partial
 import json
 import pathlib
 
+
 class UserConfig:
     def __init__(self, settings_location=None) -> None:
         self.task_queue = {
@@ -27,7 +28,7 @@ class UserConfig:
                 "STRINGTOLIST:,",
                 "REMOVEEMPTY",
                 "LISTTOSTRING: | ",
-            ],#the other two taskqueues here are arbitrary but valid (in terms of input/output datatypes)
+            ],  # the other two taskqueues here are arbitrary but valid (in terms of input/output datatypes)
         }  # this is where we'll define the built-ins
         # plan is to eventually also impliment:
         # user saved (by json file)
@@ -44,31 +45,33 @@ class UserConfig:
                     self.tq_filepath.exists()
                 ):  # if the file already exists, load the settings from it instead of just using the built-ins
                     self.load_task_queue()
-                    #with open(self.tq_filepath, "r") as file:
+                    # with open(self.tq_filepath, "r") as file:
                     #    self.task_queue = json.load(file)
                 else:  # set config file with default task queue hardcoded above (as we've been passed a dir but the file didn't exist yet)
                     self.save_task_queue()
-                    #with open(self.tq_filepath, "w") as file:
+                    # with open(self.tq_filepath, "w") as file:
                     #    json.dump(self.task_queue, file)
             except:
                 print("FAILED TO LOAD SETTINGS JSON FILE")
-        else:#defaults to module dir
-            self.tq_filepath = pathlib.Path(__file__).parent.resolve() / "user_task_queues.json"
+        else:  # defaults to module dir
+            self.tq_filepath = (
+                pathlib.Path(__file__).parent.resolve() / "user_task_queues.json"
+            )
             if (
                 self.tq_filepath.exists()
             ):  # if the file already exists, load the settings from it instead of just using the built-ins
                 self.load_task_queue()
-                #with open(self.tq_filepath, "r") as file:
+                # with open(self.tq_filepath, "r") as file:
                 #    self.task_queue = json.load(file)
             else:  # set config file with default task queue hardcoded above (as we've been passed a dir but the file didn't exist yet)
                 self.save_task_queue()
-                #with open(self.tq_filepath, "w") as file:
+                # with open(self.tq_filepath, "w") as file:
                 #    json.dump(self.task_queue, file)
             # UI can use to then prompt the user for a settings location should they try and save task queues later
 
-    #not decided if below will be kept or not, was thinking for providing method to set filepath on instances of 
-    #class outside the module i.e. to allow user to set in gui, though this could simply be done by directly accessing attr...    
-    def set_tq_filepath(self,fp):
+    # not decided if below will be kept or not, was thinking for providing method to set filepath on instances of
+    # class outside the module i.e. to allow user to set in gui, though this could simply be done by directly accessing attr...
+    def set_tq_filepath(self, fp):
         """Takes in a pathlib.filepath object to set tq_filepath attr"""
         self.tq_filepath = fp
 
@@ -78,16 +81,22 @@ class UserConfig:
 
     def save_task_queue(self):
         with open(self.tq_filepath, "w") as file:
-            json.dump(self.task_queue,file)
+            json.dump(self.task_queue, file)
 
     # load and save config
 
 
 class TaskQueue:
     """A class to define the task queue functionality and available tasks."""
+
     def __init__(self) -> None:
-        self.tasks = {#every task has a a name, function, no of arguments, acceptable input types and output type used for chaining validation
-            "STRIPWHITESPACE": {"function": strip_whitespace, "arguments": 0,'input_types':['string'],'output_type':'string'},
+        self.tasks = {  # every task has a a name, function, no of arguments, acceptable input types and output type used for chaining validation
+            "STRIPWHITESPACE": {
+                "function": strip_whitespace,
+                "arguments": 0,
+                "input_types": ["string"],
+                "output_type": "string",
+            },
             "UNESCAPESPECIALS": {"function": unescape_specials, "arguments": 0},
             "EXTRACTINTS": {"function": extract_ints, "arguments": 0},
             "STRINGTOLIST": {"function": string_to_list, "arguments": 1},
@@ -99,6 +108,8 @@ class TaskQueue:
             "LISTTOTABLE": {"function": list_to_table, "arguments": 1},
             "REVERSETABLE": {"function": reverse_table, "arguments": 0},
             "GETCOLUMN": {"function": get_column, "arguments": 1},
+            "FOREACH": {"function": None, "arguments": 0},
+            "ENDFOR": {"function": None, "arguments": 0},
         }  # need to define the tasks in this dict
 
     def valid(self, previous):
@@ -141,7 +152,7 @@ class TaskQueue:
 
     def call_task(self, task, working_text):
         tasks = self.tasks
-        print(f'\ntask: {task} : colons : {self.count_colons(task)}')
+        print(f"\ntask: {task} : colons : {self.count_colons(task)}")
         # count number of values passed to task (number of colons)
         if task.split(":")[0] not in tasks.keys():
             print(task, "not in keys!")
@@ -149,16 +160,18 @@ class TaskQueue:
         if self.count_colons(task) == 0:
             working_text = tasks[task.split(":")[0]]["function"](working_text)
         elif self.count_colons(task) == 1:
-            working_text = tasks[task.split(":")[0]]["function"](working_text, task.split(":")[1])
+            working_text = tasks[task.split(":")[0]]["function"](
+                working_text, task.split(":")[1]
+            )
         elif self.count_colons(task) == 2:
             working_text = tasks[task.split(":")[0]]["function"](
                 working_text,
                 task.split(":")[1],
                 task.split(":")[2],
             )
-        #else:
-        #    print(f'\n\n{task}\n\n')
-            
+            # else:
+            #    print(f'\n\n{task}\n\n')
+
             """
             print("\nworkingtext:\n", working_text)#why am I using partial here, surely that's not needed? hangover from tkinter implementation from earlier days?
             working_text = partial(
@@ -177,7 +190,6 @@ class TaskQueue:
             )()
             # need to figure out more complex logic to account for if a passed argument is itself a colon...!
 """
-
 
         return working_text
         # this function massively reduces the code needed in run_queue, and is better at DRY
@@ -216,7 +228,7 @@ class TaskQueue:
                         print(task, working_text)
                 working_text = intermediary
             # --------------------------------------------------------------------------------------
-            elif task.split(':')[0] in self.tasks.keys():
+            elif task.split(":")[0] in self.tasks.keys():
                 # task is valid, process using dictionary
                 working_text = self.call_task(task, working_text)
             # so far we have one command in this new mechanism and if this works, we can start removing the below
@@ -280,5 +292,3 @@ class TaskQueue:
                 print(task, working_text)
 
         return working_text
-
-

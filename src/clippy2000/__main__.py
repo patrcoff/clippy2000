@@ -3,7 +3,8 @@ from task_queue import *
 import sys
 from PyQt6.QtGui import *
 from PyQt6.QtWidgets import *
-#from platform import platform
+
+# from platform import platform
 
 # from pystray import Menu, MenuItem as item
 # import pystray
@@ -29,7 +30,7 @@ class App(QMainWindow):
         System tray object from PyQt
     first : QAction
         The first entry in the system tray menu
-    second : QAction
+    last : QAction
         The last entry in the system tray menu
     m : QMenu
         The menu object of the system tray icon
@@ -44,12 +45,7 @@ class App(QMainWindow):
     def __init__(self):
         super(App, self).__init__()
 
-        #self.platform = platform()#not currently used but may decide to place config files in different locations depending on this
-
-        self.user_config = UserConfig(
-            pathlib.Path.home() / 'Clippy2000'
-        )
-
+        self.user_config = UserConfig(pathlib.Path.home() / "Clippy2000")
 
         self.taskQueue = TaskQueue()
         self.initUI()
@@ -61,17 +57,15 @@ class App(QMainWindow):
     def load_config(self):
         self.user_config.load_task_queue()
 
-    def save_config():
-        pass
+    def save_config(self):
+        self.user_config.save_task_queue()
 
-    # load config
-    # save config (config will be handled in task_queue module and called here to keep sepatation between the text processing and config saving, and interface sides)
-
-    # def add_sys_menu(self,menu,tray):
-
-    def initUI(self):  # we need to modify this to create our editor window
-        icon_path = pathlib.Path(__file__).parent.resolve() / "favicon.ico"#when we migrate this code out of 'prototyping dir' we will maybe add a module subdir for images etc
-        icon = QIcon(f'{icon_path}')
+    def initUI(self):
+        # SYSTEM TRAY ------------------------------------------------------------
+        icon_path = (
+            pathlib.Path(__file__).parent.resolve() / "favicon.ico"
+        )  # when we migrate this code out of 'prototyping dir' we will maybe add a module subdir for images etc
+        icon = QIcon(f"{icon_path}")
         self.tray = QSystemTrayIcon(self)
         self.tray.setIcon(icon)
         self.m = QMenu()
@@ -80,44 +74,117 @@ class App(QMainWindow):
         self.first.triggered.connect(self.show)
         self.m.addAction(self.first)
 
-        self.second = QAction("refresh tray")
-        self.second.triggered.connect(self.refreshTrayMenu)
-        self.m.addAction(self.second)
+        self.last = QAction("refresh tray")
+        self.last.triggered.connect(self.refreshTrayMenu)
+        self.m.addAction(self.last)
 
         self.tray.setContextMenu(self.m)
-
         self.tray.show()
-        #------------------------------------------------------------------------
-        #NEXT UP: CREATE A WINDOW TO SHOW THE SAVED TASK QUEUES, WITH A DESCRIPTION OF EACH
-        #AND THEN A WINDOW FOR EDITING THE INDIVIDUAL TASK QUEUES
-        layout = QVBoxLayout()
+
+        # ------------------------------------------------------------------------
+        # EDITOR WINDOW
+
+        VLayout = QVBoxLayout()
+        # HLayout = QHBoxLayout()
         centralWidget = QWidget(self)
-        centralWidget.setLayout(layout)
+
+        centralWidget.setLayout(VLayout)
         self.keys = [x for x in self.user_config.task_queue]
-        #print(self.keys)
-        for i in range(len(self.keys)):
-            layout.addWidget(QLabel(self.keys[i-1]))
-            #self.sryj(QLabel(self.keys[i-1]))
-        #self.setLayout(self.layout)
-        #textEdit = QTextEdit()
+        self.selected = self.keys[0]
+        self.current_taskqueue = [
+            x.split(":")[0] for x in self.user_config.task_queue[self.selected]
+        ]
+
+        self.dropdown = QComboBox()
+        self.dropdown.addItems(self.keys)
+        self.dropdown.addItems("ADD NEW")
+        self.dropdown.currentTextChanged.connect(self.update_selected)
+
+        VLayout.addWidget(self.dropdown)
+
+        self.MiddleLayout = QVBoxLayout()
+        # self.MiddleLayout.addWidget(QLabel(str(self.user_config.task_queue[self.selected])))
+        self.refresh_middle_layout()
+        VLayout.addLayout(self.MiddleLayout)
+
+        bottomLayout = QHBoxLayout()
+        save = QPushButton("SAVE")
+        close = QPushButton("EXIT")
+        close.clicked.connect(self.close)
+        save.clicked.connect(self.save_task_queue)
+        bottomLayout.addWidget(save)
+        bottomLayout.addWidget(close)
+
+        VLayout.addLayout(bottomLayout)
+
         self.setCentralWidget(centralWidget)
- 
-        #p = QPushButton("Click Me", self)
-        #self.setCentralWidget(p)
-        #p.clicked.connect(self.onClick)  # PLACEHOLDER FOR EDITOR WINDOW
-       # -----------------------------------------------------------------------
 
+        # -----------------------------------------------------------------------
 
-    def onClick(self):
-        print("YAY!")
-        # self.m.clear()
-        # use the above if we're building the full menu from scratch (we probably will, unless we can address them by index?)
-        # self.m.addAction('First')
-        self.m.addAction("Third")
-        # self.tray.setContextMenu(self.m)
-        # calling setContextMenu multiple times breaks the systray icon for some reason... just don't do it!
+    def save_task_queue(self):
+        self.user_config.task_queue[self.selected] = self.current_taskqueue
+        self.user_config.save_task_queue()
 
-    def interim(
+    def clear_layout(self, layout):
+        while layout.count():
+            child = layout.takeAt(0)
+            if child.widget() is not None:
+                child.widget().deleteLater()
+            elif child.layout() is not None:
+                self.clear_layout(child.layout())
+
+    def update_selected(
+        self, text
+    ):  # let's maybe rename this after we add the full window refreshing functionality to reflect changing selected taskqueue in the editor
+        self.selected = text
+        if text == "ADD NEW":
+            pass
+            # get user input for name of new task
+            # add to user config file and save with contents of one entry
+            # set as selected
+            # refresh_middle_layout
+        else:
+            self.current_taskqueue = [
+                x.split(":")[0] for x in self.user_config.task_queue[self.selected]
+            ]
+            self.refresh_middle_layout()
+            # print(text)
+
+    def refresh_middle_layout(self):
+        # self.MiddleLayout.replaceWidget()
+        self.clear_layout(self.MiddleLayout)
+        # taskqueue = self.user_config.task_queue[self.selected]
+        # for task in taskqueue:
+        #    self.MiddleLayout.addWidget(QLabel(task))
+
+        for i in range(len(self.current_taskqueue)):
+            row = QHBoxLayout()
+            task_selector = QComboBox()
+            task_selector.addItems(self.taskQueue.tasks.keys())
+            task_selector.setCurrentText(self.current_taskqueue[i])
+            task_selector.currentTextChanged.connect(partial(self.task_edited, i))
+            row.addWidget(task_selector)
+            row.addWidget(QLabel(self.current_taskqueue[i]))
+            row.addWidget(QLabel("Something task description text goes here"))
+            self.MiddleLayout.addLayout(row)
+        # REPLACE ABOVE WITH THE EDITOR VIEW
+        # FOR TASK IN TASKQUEUE: ADD ROW WITH TASK SELECTED IN DROPDOWN, 2X VAR ENTRY BOXES
+        # TASK DROPDOWN SHOULD HAVE OPTIONS TO ADD A NEW TASK IN THE QUEUE, DELETE THE SELECTED TASK
+
+    def task_edited(self, i, task):
+        print(f"{i}:{task}")
+        if task == "ADD NEW":
+            pass
+        else:
+            self.current_taskqueue = (
+                self.current_taskqueue[:i] + [task] + self.current_taskqueue[i + 1 :]
+            )
+            self.refresh_middle_layout()
+
+    def refreshMainWindow(self, focus):
+        pass
+
+    def run_task_queue(
         self, var
     ):  # testing below functionality before creating intended function to call taskqueue
         # print(var)
@@ -150,11 +217,11 @@ class App(QMainWindow):
             self.user_config.task_queue
         ):  # this is only adding the last one, not using self.com doesn't work though
             com = QAction(taskQueue)
-            com.triggered.connect(partial(self.interim, taskQueue))
+            com.triggered.connect(partial(self.run_task_queue, taskQueue))
             self.objectList.append(com)
         for i in range(len(self.objectList)):
             self.m.addAction(self.objectList[i])
-        self.m.addAction(self.second)
+        self.m.addAction(self.last)
 
     def show_win(self):
         self.show()
@@ -168,6 +235,7 @@ def main():
     app.setQuitOnLastWindowClosed(False)
     win = App()
     sys.exit(app.exec())
+
 
 if __name__ == "__main__":
     # print('ismain')
