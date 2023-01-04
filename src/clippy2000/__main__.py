@@ -97,7 +97,7 @@ class App(QMainWindow):
 
         self.dropdown = QComboBox()
         self.dropdown.addItems(self.keys)
-        self.dropdown.addItems("ADD NEW")
+        self.dropdown.addItem("ADD NEW")
         self.dropdown.currentTextChanged.connect(self.update_selected)
 
         VLayout.addWidget(self.dropdown)
