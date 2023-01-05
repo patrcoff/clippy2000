@@ -76,8 +76,8 @@ class App(QMainWindow):
 
         self.last = QAction("refresh tray")
         self.last.triggered.connect(self.refreshTrayMenu)
-        self.m.addAction(self.last)
-
+        #self.m.addAction(self.last)
+        self.refreshTrayMenu()
         self.tray.setContextMenu(self.m)
         self.tray.show()
 
@@ -91,9 +91,7 @@ class App(QMainWindow):
         centralWidget.setLayout(VLayout)
         self.keys = [x for x in self.user_config.task_queue]
         self.selected = self.keys[0]
-        self.current_taskqueue = [
-            x.split(":")[0] for x in self.user_config.task_queue[self.selected]
-        ]
+        self.current_taskqueue = self.user_config.task_queue[self.selected]
 
         self.dropdown = QComboBox()
         self.dropdown.addItems(self.keys)
@@ -135,18 +133,25 @@ class App(QMainWindow):
 
     def update_selected(
         self, text
-    ):  # let's maybe rename this after we add the full window refreshing functionality to reflect changing selected taskqueue in the editor
-        self.selected = text
+    ):
+        
         if text == "ADD NEW":
-            pass
             # get user input for name of new task
+            name, ok = QInputDialog.getText(self,'Input Dialog','Please name your new TaskQueue:')
             # add to user config file and save with contents of one entry
+            self.user_config.task_queue[name] = ['DEFAULT']
+            #above adds one default task which is a placeholder so we have at minimum 1 task dropdown
+            self.user_config.save_task_queue()
+            self.dropdown.addItem(name)
             # set as selected
+            self.selected = name
+            self.current_taskqueue = self.user_config.task_queue[self.selected]
+            self.dropdown.setCurrentText(name)
             # refresh_middle_layout
+            self.refresh_middle_layout()
         else:
-            self.current_taskqueue = [
-                x.split(":")[0] for x in self.user_config.task_queue[self.selected]
-            ]
+            self.selected = text
+            self.current_taskqueue = self.user_config.task_queue[self.selected]
             self.refresh_middle_layout()
             # print(text)
 
@@ -157,25 +162,68 @@ class App(QMainWindow):
         # for task in taskqueue:
         #    self.MiddleLayout.addWidget(QLabel(task))
 
+        #BUILD OUT A ROW FOR EACH TASK IN THE TASK QUEUE------------------------------------------------------|
         for i in range(len(self.current_taskqueue)):
             row = QHBoxLayout()
             task_selector = QComboBox()
             task_selector.addItems(self.taskQueue.tasks.keys())
-            task_selector.setCurrentText(self.current_taskqueue[i])
+            task_selector.setCurrentText(self.current_taskqueue[i].split(':')[0])
             task_selector.currentTextChanged.connect(partial(self.task_edited, i))
+            
+            var_input1 = QLineEdit()
+            var_input2 = QLineEdit()
+            var_input1.textEdited.connect(partial(self.vars_edited,0,i))
+            var_input2.textEdited.connect(partial(self.vars_edited,1,i))
+
+            optional_vars = [var_input1,var_input2]#count how many colons are in the task as these is optional and variable between the different available tasks
+            for x in range(self.taskQueue.count_colons(self.current_taskqueue[i])):
+                optional_vars[x].setText(self.current_taskqueue[i].split(':')[x+1])
+            
+            #ADD THE DROPDOWN TASK SELECTOR IN THE ROW
             row.addWidget(task_selector)
-            row.addWidget(QLabel(self.current_taskqueue[i]))
+            
+            #disable the entries which are invalid as per the current task
+
+            if self.taskQueue.tasks[self.current_taskqueue[i].split(':')[0]]['arguments'] == 0:
+                optional_vars[0].setDisabled(True)
+                optional_vars[1].setDisabled(True)  
+                #block out both
+            elif self.taskQueue.tasks[self.current_taskqueue[i].split(':')[0]]['arguments'] == 1:
+                #block out 1
+                optional_vars[1].setDisabled(True)
+
+            row.addWidget(optional_vars[0])
+            row.addWidget(optional_vars[1])
+
             row.addWidget(QLabel("Something task description text goes here"))
+            
             self.MiddleLayout.addLayout(row)
-        # REPLACE ABOVE WITH THE EDITOR VIEW
-        # FOR TASK IN TASKQUEUE: ADD ROW WITH TASK SELECTED IN DROPDOWN, 2X VAR ENTRY BOXES
-        # TASK DROPDOWN SHOULD HAVE OPTIONS TO ADD A NEW TASK IN THE QUEUE, DELETE THE SELECTED TASK
+
+
+    def vars_edited(self, var_index, i, text):
+        print(f'{i}:{text}')
+        #can have 1 argument and this is it
+        if self.taskQueue.tasks[self.current_taskqueue[i].split(':')[0]]['arguments'] == 1:
+            self.current_taskqueue[i] = self.current_taskqueue[i].split(':')[0] + ':' + text
+        #can have 2 arguments and this is the first one
+        elif var_index == 0 and self.taskQueue.tasks[self.current_taskqueue[i].split(':')[0]]['arguments'] == 2:
+            self.current_taskqueue[i] = self.current_taskqueue[i].split(':')[0] + ':' + text + ':' + self.current_taskqueue[i].split(':')[2]
+        #can have 2 arguments and this is the second one
+        else:
+            self.current_taskqueue[i] = self.current_taskqueue[i].split(':')[0] + ':' + self.current_taskqueue[i].split(':')[1] + ':' + text
+        #as we have disabled the var text entries for tasks with 1 or none possible vars
+        #we do not need to do any error checking here for tasks with no colons in the text
+        #this relies on no part of the code adding in tasks which could have a colon but don't 
+        # i.e. any built-ins MUST follow this formatting rule, even if the var is blank
 
     def task_edited(self, i, task):
         print(f"{i}:{task}")
         if task == "ADD NEW":
-            pass
+            self.current_taskqueue = self.current_taskqueue[:i] + ["DEFAULT"] + self.current_taskqueue[i:]
+            #add a new task of default type in the position i
+            self.refresh_middle_layout()
         else:
+            task = task + self.taskQueue.tasks[task]['arguments']*':'#this adds a task with the correct number of possible colons
             self.current_taskqueue = (
                 self.current_taskqueue[:i] + [task] + self.current_taskqueue[i + 1 :]
             )
@@ -221,7 +269,7 @@ class App(QMainWindow):
             self.objectList.append(com)
         for i in range(len(self.objectList)):
             self.m.addAction(self.objectList[i])
-        self.m.addAction(self.last)
+        #self.m.addAction(self.last)
 
     def show_win(self):
         self.show()

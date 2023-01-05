@@ -18,8 +18,8 @@ class UserConfig:
             "CodefromRP": [
                 "STRINGTOLIST:\n",
                 "FOREACH",
-                "REMOVE:>>> ",
-                "REMOVE:... ",
+                "REMOVEY:>>> ",
+                "REMOVEY:... ",
                 "ENDFOR",
                 "LISTTOSTRING:\n",
             ],  # this is for copying code from realpython repl blocks where lines start with the repl >>> and ... symbols
@@ -96,7 +96,8 @@ class TaskQueue:
                 "arguments": 0,
                 "input_types": ["string"],
                 "output_type": "string",
-            },
+            },#above to be repeated for below at some point
+            "DEFAULT": {"function": None, "arguments": 0},
             "UNESCAPESPECIALS": {"function": unescape_specials, "arguments": 0},
             "EXTRACTINTS": {"function": extract_ints, "arguments": 0},
             "STRINGTOLIST": {"function": string_to_list, "arguments": 1},
@@ -110,6 +111,7 @@ class TaskQueue:
             "GETCOLUMN": {"function": get_column, "arguments": 1},
             "FOREACH": {"function": None, "arguments": 0},
             "ENDFOR": {"function": None, "arguments": 0},
+            "ADD NEW": {"function": None, "arguments": 0},
         }  # need to define the tasks in this dict
 
     def valid(self, previous):
