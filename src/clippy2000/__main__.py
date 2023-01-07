@@ -90,7 +90,7 @@ class App(QMainWindow):
 
         centralWidget.setLayout(VLayout)
         self.keys = [x for x in self.user_config.task_queue]
-        self.selected = self.keys[0]
+        self.selected = self.keys[0]#I don't know why I have done this in two steps?
         self.current_taskqueue = self.user_config.task_queue[self.selected]
 
         self.dropdown = QComboBox()
@@ -98,7 +98,14 @@ class App(QMainWindow):
         self.dropdown.addItem("ADD NEW")
         self.dropdown.currentTextChanged.connect(self.update_selected)
 
-        VLayout.addWidget(self.dropdown)
+        delete_btn = QPushButton('DELETE')
+        delete_btn.clicked.connect(self.delete_task_queue)
+
+        selected_taskqueue_row = QHBoxLayout()
+        selected_taskqueue_row.addWidget(self.dropdown)
+        selected_taskqueue_row.addWidget(delete_btn)
+
+        VLayout.addLayout(selected_taskqueue_row)
 
         self.MiddleLayout = QVBoxLayout()
         # self.MiddleLayout.addWidget(QLabel(str(self.user_config.task_queue[self.selected])))
@@ -118,6 +125,23 @@ class App(QMainWindow):
         self.setCentralWidget(centralWidget)
 
         # -----------------------------------------------------------------------
+
+    def delete_task(self,index):
+        #should add a check here to see if it is the last item in the task_queue, if so, delete the task_queue instead and chastise user
+        #print(index)
+        self.current_taskqueue = self.current_taskqueue[:index] + self.current_taskqueue[index +1 :]
+        self.save_task_queue()
+        self.refresh_middle_layout()
+
+    def delete_task_queue(self):
+        name = self.selected
+        print(name)
+        self.user_config.task_queue.pop(name,None)
+        self.save_task_queue()
+        self.dropdown.removeItem(self.dropdown.findText(name))#THIS IS NOT HOW REMOVE ITEM WORKS, PROBABLY NEED TO GET THE ITEM FIRST USING REFERENCE TO NAME AND THEN CALL DELETEITEM ON IT
+        self.selected = list(self.user_config.task_queue.keys())[0]
+        self.dropdown.setCurrentText(self.selected)
+        self.refresh_middle_layout()
 
     def save_task_queue(self):
         self.user_config.task_queue[self.selected] = self.current_taskqueue
@@ -196,7 +220,11 @@ class App(QMainWindow):
             row.addWidget(optional_vars[1])
 
             row.addWidget(QLabel("Something task description text goes here"))
-            
+
+            delete = QPushButton('DELETE')
+            delete.clicked.connect(partial(self.delete_task,i))
+            row.addWidget(delete)
+
             self.MiddleLayout.addLayout(row)
 
 
@@ -219,7 +247,7 @@ class App(QMainWindow):
     def task_edited(self, i, task):
         print(f"{i}:{task}")
         if task == "ADD NEW":
-            self.current_taskqueue = self.current_taskqueue[:i] + ["DEFAULT"] + self.current_taskqueue[i:]
+            self.current_taskqueue = self.current_taskqueue[:i+1] + ["DEFAULT"] + self.current_taskqueue[i+1:]
             #add a new task of default type in the position i
             self.refresh_middle_layout()
         else:

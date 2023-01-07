@@ -46,6 +46,14 @@ def lines_many_to_one(x, separator=","):
     remove_n = separator.join(remove_r.split("\n"))
     return remove_n
 
+def lines_one_to_many(x, separator):
+    return '\n'.join(x.split(separator))
+
+def left_strip(x):
+    return x.lstrip()
+
+def right_strip(x):
+    return x.rstrip()
 
 def replace_string(x, y, z):
     return x.replace(y, z)
