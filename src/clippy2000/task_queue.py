@@ -9,25 +9,13 @@ class UserConfig:
     def __init__(self, settings_location=None) -> None:
         self.task_queue = {
             "TASK1": [
-                "LINESMANYTOONE",
-                "STRINGTOLIST:,",
-                "REMOVEEMPTY",
-                "LISTTOSTRING: | ",
-                "STRIPWHITESPACE",
+                "DEFAULT"
             ],
             "CodefromRP": [
-                "STRINGTOLIST:\n",
-                "FOREACH",
-                "REMOVEY:>>> ",
-                "REMOVEY:... ",
-                "ENDFOR",
-                "LISTTOSTRING:\n",
+                "DEFAULT"
             ],  # this is for copying code from realpython repl blocks where lines start with the repl >>> and ... symbols
             "TASK3": [
-                "LINESMANYTOONE",
-                "STRINGTOLIST:,",
-                "REMOVEEMPTY",
-                "LISTTOSTRING: | ",
+                "DEFAULT"
             ],  # the other two taskqueues here are arbitrary but valid (in terms of input/output datatypes)
         }  # this is where we'll define the built-ins
         # plan is to eventually also impliment:

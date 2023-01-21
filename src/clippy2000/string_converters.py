@@ -22,37 +22,37 @@ import re
 
 # --------------------------------------------------------------------
 # STRING FUNCTIONS
-def unescape_specials(x):
+def unescape_specials(x:str) -> str:
     return repr(x)[1:-1]  # the repr func adds quotes to the text which we don't need
 
 
 def strip_whitespace(
-    x,
-):  # TO DECIDE IF THIS SHOULD INCLUDE LINEBREAKS OR NOT - currently it escapes all whitespace including \r and \n
+    x: str,
+) -> str:  # TO DECIDE IF THIS SHOULD INCLUDE LINEBREAKS OR NOT - currently it escapes all whitespace including \r and \n
     return "".join(x.split())
 
 
-def extract_ints(x):  # need a float version of this...
+def extract_ints(x: str) -> str:  # need a float version of this...
     return ",".join([i for i in re.split(r"\D+", x) if i != ""])
 
 
-def string_to_list(x, splitter):
+def string_to_list(x: str, splitter: str) -> list:
     print(splitter)
     return x.split(splitter)
 
 
-def lines_many_to_one(x, separator=","):
+def lines_many_to_one(x: str, separator: str = ",") -> str:
     remove_r = "".join(x.split("\r"))
     remove_n = separator.join(remove_r.split("\n"))
     return remove_n
 
-def lines_one_to_many(x, separator):
+def lines_one_to_many(x: str, separator: str) -> str:
     return '\n'.join(x.split(separator))
 
-def left_strip(x):
+def left_strip(x: str) -> str:
     return x.lstrip()
 
-def right_strip(x):
+def right_strip(x: str) -> str:
     return x.rstrip()
 
 def replace_string(x, y, z):
