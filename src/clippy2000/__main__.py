@@ -45,6 +45,11 @@ class App(QMainWindow):
     def __init__(self):
         super(App, self).__init__()
 
+
+        #DEPRECATION NOTICE---------------------------------------------
+        #TaskQueue module is to be pulled out into its own separate module, where it will be generalised further
+        #to provide similar functionality for different applications
+        #user_config will be removed from the TaskQueue module and be instead handled natively in the front end apps themselves
         self.user_config = UserConfig(pathlib.Path.home() / "Clippy2000")
 
         self.taskQueue = TaskQueue()
