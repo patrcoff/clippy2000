@@ -1,5 +1,5 @@
 from functools import partial
-from task_queue import UserConfig
+from user_conf import UserConfig
 from TaskQueue import TaskQueue
 import sys
 from PyQt6.QtGui import *

@@ -1,5 +1,5 @@
 from functools import partial
-from task_queue import *
+from user_conf import *
 import sys
 from PyQt6.QtGui import *
 from PyQt6.QtWidgets import *
@@ -20,9 +20,9 @@ class App(QMainWindow):
     ...
     Attributes
     ----------
-    config : task_queue.Config
-        config object of task_queue module which contains saved task queues
-    taskQueue : task_queue.TaskQueue
+    config : user_conf.Config
+        config object of user_conf module which contains saved task queues
+    taskQueue : user_conf.TaskQueue
         TaskQueue object which holds the available tasks as well as methods to parse and run task queues
     debug : bool
         Used to determine whether user debug mode is used by TaskQueue object methods
