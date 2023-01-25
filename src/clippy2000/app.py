@@ -157,6 +157,7 @@ class App(QMainWindow):
     def save_task_queue(self):
         self.user_config.task_queue[self.selected] = self.current_taskqueue
         self.user_config.save_task_queue()
+        self.refreshTrayMenu()
 
     def clear_layout(self, layout):
         while layout.count():
