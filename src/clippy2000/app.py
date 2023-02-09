@@ -1,6 +1,6 @@
 from functools import partial
 from user_conf import UserConfig
-from TaskQueue import TaskQueue
+from TaskQueue import Queue
 import sys
 from PyQt6.QtGui import *
 from PyQt6.QtWidgets import *
@@ -56,7 +56,7 @@ class App(QMainWindow):
         #user_config will be removed from the TaskQueue module and be instead handled natively in the front end apps themselves
         self.user_config = UserConfig(pathlib.Path.home() / "Clippy2000")
 
-        self.taskQueue = TaskQueue.TaskQueue([string_converters])
+        self.taskQueue = Queue([string_converters])
         self.taskQueue.available_tasks.update({"ADD NEW": {"function": None, "arguments": 0}})
         print(self.taskQueue.available_tasks)
         self.initUI()
